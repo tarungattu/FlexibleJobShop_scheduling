@@ -24,13 +24,13 @@ import inspect
 
 c = 6
 n = 6
-num_amrs = 6
-N = 100
+num_amrs = 4
+N = 200
 pc = 0.7
 pm = 0.5
 pswap = 0.5
 pinv = 0.5
-T = 250
+T = 300
 
 workcenter_data = benchmarks.ft06['workcenter_data']
 ptime_data = benchmarks.ft06['ptime_data']
@@ -180,7 +180,9 @@ get_integer_list(): gets the integer list which will have the random numbers ran
 
 get_jobindex_list(): takes in the integer list and permutates the job number e.g:        [2, 2, 1, 2, 1, 3, 3, 3, 1, 2]
 
-get_machine_indices_list(): generate a list of ?(randomly) selected machine index for each workcenter for each operation
+get_machine_indices_list(): generate list of machine indices selected based upon decoding
+
+get_random_machine_indices_list(): randomly select a machine in the available machine list
 
 get_operation_objects(): takes the operation objects for all jobs and puts them in the list according to job index e.g :    [job2.op1, job2.op2, job1.op1, ..., job2.op4 ]. Also adds the machine number permutated to each operation based on machine indices.
 
@@ -237,6 +239,17 @@ def get_machine_indices_list(encoded_list, workcenter_sequence, machine_data, op
     for r, c, operation in zip(encoded_list, workcenter_sequence, operation_objects):
         r = round(r,0)
         machine_no = int(r % machine_data[c])
+        machine_indices_list.append(machine_no)
+        operation.machine = machine_no
+        
+    return machine_indices_list
+
+def get_random_machine_indices_list(encoded_list, workcenter_sequence, machine_data, operation_objects):
+    
+    machine_indices_list = []
+    for  c, operation in zip(workcenter_sequence, operation_objects):
+        
+        machine_no = random.randint(0, machine_data[c] - 1)
         machine_indices_list.append(machine_no)
         operation.machine = machine_no
         
@@ -460,7 +473,7 @@ def process_chromosome(chromosome, amr_assignments):
     # # get the sequence of machines and ptimes
     workcenter_sequence, ptime_sequence = get_workcenter_and_time_sequence(operation_objects)
     
-    machine_sequence = get_machine_indices_list(chromosome, workcenter_sequence, machine_data, operation_objects)
+    machine_sequence = get_random_machine_indices_list(chromosome, workcenter_sequence, machine_data, operation_objects)
     # # SET TRAVEL TIMES FOR EACH JOB
     set_travel_time(jobs, amrs, distance_matrix)
     

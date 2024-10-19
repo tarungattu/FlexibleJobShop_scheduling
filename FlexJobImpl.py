@@ -25,12 +25,12 @@ import inspect
 c = 6
 n = 6
 num_amrs = 4
-N = 200
+N = 500
 pc = 0.7
 pm = 0.5
 pswap = 0.5
 pinv = 0.5
-T = 300
+T = 350
 
 workcenter_data = benchmarks.ft06['workcenter_data']
 ptime_data = benchmarks.ft06['ptime_data']
@@ -81,10 +81,23 @@ def generate_population(N, n, c):
 def generate_random_population(N, n, c, amr_assignments):
     encoded_lists = []
     population = []
+    heuristic = 0
     for _ in range(N):
         num = [round(random.uniform(0,c*n), 2) for _ in range(n*c)]
         encoded_lists.append(num)
-        chromosome = process_chromosome(num, amr_assignments)
+        chromosome = process_chromosome(num, amr_assignments, heuristic)
+        population.append(chromosome)
+        
+    return population
+
+def generate_heuristic_population(N, n, c, amr_assignments):
+    encoded_lists = []
+    population = []
+    heuristic = 1
+    for _ in range(N):
+        num = [round(random.uniform(0,c*n), 2) for _ in range(n*c)]
+        encoded_lists.append(num)
+        chromosome = process_chromosome(num, amr_assignments, heuristic)
         population.append(chromosome)
         
     return population
@@ -268,6 +281,13 @@ def get_Cmax(workcenters):
                 max_runtime = machine.finish_operation_time
         
     return max_runtime
+
+# def get_wait_time(jobs):
+#     i = 0
+#     wait_time = 0
+#     for job in jobs:
+#         while i < len(job.operations) - 1:
+#             wait_time
         
 def calculate_Cj_with_amr(operation_schedule, workcenters, jobs, amrs):
     t_op = operation_schedule
@@ -366,7 +386,7 @@ def PlotGanttChart_with_amr_scalable(chromosome, workcenter_machine_list):
     for wc_index, machines_in_wc in enumerate(workcenter_machine_list):
         for machine_num in range(machines_in_wc):
             yticks.append(current_tick)
-            ytick_labels.append(f'{wc_index+1}-{machine_num+1}')  # Workcenter-Machine label
+            ytick_labels.append(f'{wc_index}-{machine_num}')  # Workcenter-Machine label
             current_tick += 1
 
     ax.set_ylim(-0.5, total_machines - 0.5)
@@ -397,7 +417,7 @@ def PlotGanttChart_with_amr_scalable(chromosome, workcenter_machine_list):
                     # Travel time block
                     ax.broken_barh([(j.Cj, j.travel_time)], (-0.3 + machine_count, 0.6), facecolor='black', linewidth=1, edgecolor='black')
                     # Text in the middle of job blocks
-                    ax.text(ST + (j.Pj / 2 - 0.3), machine_count + 0.03, '{}'.format(j.job_number + 1), fontsize=10, color='white')
+                    ax.text(ST + (j.Pj / 2 - 0.3), machine_count + 0.03, '{}'.format(j.job_number), fontsize=10, color='white')
 
             machine_count += 1  # Move to the next machine in global index
 
@@ -407,7 +427,7 @@ def PlotGanttChart_with_amr_scalable(chromosome, workcenter_machine_list):
     top_ax.set_xlabel('time', fontweight='bold', loc='right', color='black', fontsize=12)
     top_ax.set_ylim(-0.5, num_amrs - 0.5)
     top_ax.set_yticks(range(num_amrs), minor=False)
-    top_ax.set_yticklabels(range(1, num_amrs + 1), minor=False)
+    top_ax.set_yticklabels(range(0, num_amrs), minor=False)
     top_ax.tick_params(axis='y', labelcolor='black', labelsize=10)
     top_ax.set_xlim(0, Cmax + 2)
     top_ax.tick_params(axis='x', labelcolor='black', labelsize=12)
@@ -422,7 +442,7 @@ def PlotGanttChart_with_amr_scalable(chromosome, workcenter_machine_list):
             duration = j.job_completion_time - j.job_start_time
             if duration != 0:
                 top_ax.broken_barh([(ST, duration)], (-0.3 + i, 0.6), facecolor=colors[j.job_number], linewidth=1, edgecolor='black')
-                top_ax.text(ST + (duration) / 2 , i - 0.2, '{}'.format(j.job_number + 1), fontsize=10, ha='center', color='white')
+                top_ax.text(ST + (duration) / 2 , i - 0.2, '{}'.format(j.job_number), fontsize=10, ha='center', color='white')
 
     plt.tight_layout()
 
@@ -444,7 +464,7 @@ def PlotGanttChart_with_amr_scalable(chromosome, workcenter_machine_list):
 process_chromosome(): takes in an encoded list and spits out a fully processed chromosome.
 '''
 
-def process_chromosome(chromosome, amr_assignments):
+def process_chromosome(chromosome, amr_assignments, heuristic = 0):
     
     jobs = [Job(number) for number in range(n)]
     amrs = [AMR(number) for number in range(num_amrs)]
@@ -473,7 +493,12 @@ def process_chromosome(chromosome, amr_assignments):
     # # get the sequence of machines and ptimes
     workcenter_sequence, ptime_sequence = get_workcenter_and_time_sequence(operation_objects)
     
-    machine_sequence = get_random_machine_indices_list(chromosome, workcenter_sequence, machine_data, operation_objects)
+    if heuristic:
+        machine_sequence = get_machine_indices_list(chromosome, workcenter_sequence, machine_data, operation_objects)
+    else:
+        machine_sequence = get_random_machine_indices_list(chromosome, workcenter_sequence, machine_data, operation_objects)
+        
+        
     # # SET TRAVEL TIMES FOR EACH JOB
     set_travel_time(jobs, amrs, distance_matrix)
     
@@ -482,8 +507,8 @@ def process_chromosome(chromosome, amr_assignments):
     assign_machine_operationlist(workcenters, operation_objects)
     Cmax = get_Cmax(workcenters)
     
-    chromosome = Chromosome(chromosome)
         
+    chromosome = Chromosome(chromosome)
     chromosome.ranked_list = ranked_list
     chromosome.operation_index_list = operation_index_list
     chromosome.job_list = jobs
@@ -494,7 +519,12 @@ def process_chromosome(chromosome, amr_assignments):
     chromosome.workcenter_list = workcenters
     chromosome.ptime_sequence = ptime_sequence
     chromosome.Cmax = Cmax
-    chromosome.fitness = chromosome.Cmax + chromosome.penalty
+    chromosome.total_processing_time = sum(ptime_data)
+    chromosome.total_number_of_machines = sum(machine_data)
+    chromosome.set_idle_time()
+    chromosome.set_wait_time()
+    chromosome.set_jobs_completion_time()
+    chromosome.set_fitness()
     
     return chromosome
 
@@ -647,7 +677,8 @@ def tests():
 
     amr_assignments = test_get_amr_assignments()
     
-    processed_chromosome = process_chromosome(random_list[0], amr_assignments)
+    processed_chromosome = process_chromosome([8.15, 11.52, 21.51, 6.72, 27.93, 18.17, 19.34, 1.61, 27.56, 35.34, 30.26, 10.37, 10.28, 17.03, 20.82, 6.9, 5.29, 8.48, 19.76, 27.21, 21.37, 17.92, 7.04, 13.54, 6.91, 20.08, 27.08, 15.86, 19.45, 8.25, 6.15, 22.12, 33.75, 12.55, 7.78, 2.11], amr_assignments)
+    print(processed_chromosome.wait_time)
     PlotGanttChart_with_amr_scalable(processed_chromosome, machine_data)
     plt.show()
     print('\n')
@@ -662,7 +693,7 @@ def GeneticAlgorithm():
     ypoints = []
     
     amr_assignments = get_amr_assignments()
-    population = generate_random_population(N, n, c, amr_assignments)
+    population = generate_heuristic_population(N, n, c, amr_assignments)
         
     sorted_population = sorted(population, key = lambda  x : x.fitness )
         
@@ -711,7 +742,7 @@ def GeneticAlgorithm():
                 swap_chromosome = swapping(mutated_chromosome, new_amr_assignments)
                 
                 if swap_chromosome.Cmax < mutated_chromosome.Cmax:
-                    enhanced_list.append(swap_chromosome)
+                    # enhanced_list.append(swap_chromosome)
                     inverted_chromosome = inversion(swap_chromosome, new_amr_assignments)
                     if inverted_chromosome.Cmax < swap_chromosome.Cmax:
                         enhanced_list.append(inverted_chromosome)
@@ -777,7 +808,7 @@ def GeneticAlgorithm():
     
     print('random generated numbers:',best_chromosome.encoded_list)
     print(f'ranked list : {best_chromosome.ranked_list}\n operation_index :{best_chromosome.operation_index_list},\n operation object{best_chromosome.operation_schedule}\n')
-    print(f'machine sequence: {best_chromosome.machine_sequence}\n ptime sequence: {best_chromosome.ptime_sequence}\n Cmax: {best_chromosome.Cmax}')
+    print(f'machine sequence: {best_chromosome.machine_sequence}\n ptime sequence: {best_chromosome.ptime_sequence}\n Cmax: {best_chromosome.Cmax}\n wait time: {best_chromosome.wait_time}\n idle_time: {best_chromosome.idle_time}\n fitness: {best_chromosome.fitness}')
 
 
 

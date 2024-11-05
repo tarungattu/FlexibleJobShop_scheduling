@@ -38,6 +38,8 @@ class FlexibleJobShopScheduler():
         self.machine_data = machine_data
         self.ptime_data = ptime_data
         self.stagnation_limit = 50
+        self.parent_perc = 0.2
+        self.offspring_perc = 0.8
         
         self.activate_termination = 0
         self.enable_travel_time = 0
@@ -688,6 +690,23 @@ class FlexibleJobShopScheduler():
         sortedGen = sorted(total_population, key = lambda x : x.fitness)
         return sortedGen[:self.N], sortedGen[0]
     
+    def next_gen_selection_elitism(self, parents, offsprings, parent_perc, offspring_perc):
+        # Use elitism from parent population
+        sorted_parent = []
+        number = len(parents)  # Your number
+        twenty_percent = int(number * parent_perc)
+        sorted_parents = sorted(parents, key = lambda  x : x.fitness )
+        
+        sorted_offsprings = []
+        number = len(offsprings)  # Your number
+        eighty_percent = number - twenty_percent
+        sorted_offsprings = sorted(sorted_offsprings, key = lambda  x : x.fitness )
+        
+        total_population = sorted_parents[0:twenty_percent] + sorted_offsprings[twenty_percent:]
+        sorted_total_population = sorted(total_population, key = lambda  x : x.fitness )
+        return total_population, sorted_total_population[0]
+    
+    
     def swapping(self, chromosome, amr_assignments):
         r = random.uniform(0,1)
         if r >self.pswap:
@@ -877,11 +896,9 @@ class FlexibleJobShopScheduler():
         with open(output_file, 'w') as json_file:
             json.dump(amr_data, json_file, indent=4)
             
-    def get_file(self, best_chromosome, processing_time, converged_at, xpoints, ypoints):
+    def get_file(self, best_chromosome, processing_time, xpoints, ypoints):
         timestamp = time.strftime("%Y%m%d-%H%M%S")
         filename = f'la01{timestamp}.txt'  # CHANGE FILE NAME
-        if converged_at == 0:
-            converged_at = processing_time
 
         directory = self.save_file_directory  # CHANGE SAVING DIRECTORY
         filepath = os.path.join(directory, filename)
@@ -988,7 +1005,7 @@ class FlexibleJobShopScheduler():
                     
                     # # selection of survivors for next generation
                 
-                survivors, best_in_gen = self.next_gen_selection(winners_list, enhanced_list)
+                survivors, best_in_gen = self.next_gen_selection_elitism(winners_list, enhanced_list, self.parent_perc, self.offspring_perc)
                 
                 survivors[-1] = best_in_gen
                 if best_in_gen.fitness < best_chromosome.fitness:
@@ -1031,7 +1048,7 @@ class FlexibleJobShopScheduler():
         processing_time = end_time - start_time
         
         if self.create_txt_file:
-            self.get_file(best_chromosome, processing_time, converged_at, xpoints, ypoints)
+            self.get_file(best_chromosome, processing_time, xpoints, ypoints)
         
         
         # print(f'best Cmax = {ypoints[N-1]}')

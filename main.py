@@ -34,7 +34,7 @@ def main():
     
     
     
-    # scheduler1 = FlexibleJobShopScheduler(4, 3, 2, 50, 0.7, 0.5, 100, workcenter_data4, machine_data4, ptime_data4)    
+    scheduler1 = FlexibleJobShopScheduler(4, 3, 2, 50, 0.7, 0.5, 100, workcenter_data4, machine_data4, ptime_data4)    
     # scheduler1.set_distance_matrix(distances.four_machine_matrix)
     
     
@@ -42,7 +42,7 @@ def main():
     # scheduler1.set_distance_matrix(distances.six_machine_matrix)
     
     
-    scheduler1 = FlexibleJobShopScheduler(5, 10, 3, 100, 0.7, 0.5, 350, workcenter_data5, machine_data5, ptime_data5)    
+    # scheduler1 = FlexibleJobShopScheduler(5, 10, 3, 100, 0.7, 0.5, 350, workcenter_data5, machine_data5, ptime_data5)    
     # scheduler1 = FlexibleJobShopScheduler(5, 15, 3, 350, 0.7, 0.5, 450, la06_data5, la06_ptime5)    
     # scheduler1.set_distance_matrix(distances.five_machine_matrix)
     

@@ -24,7 +24,7 @@ class Chromosome:
         self.fitness = 99999
         
     def set_fitness(self):
-        self.fitness = self.idle_time*0.2 + self.wait_time*2 + self.jobs_completion_time*0.3 + self.Cmax*0.3 + self.penalty
+        self.fitness = self.idle_time*0 + self.wait_time*0 + self.jobs_completion_time*1 + self.Cmax*0 + self.penalty
         
     def set_wait_time(self):
         wait_time = 0

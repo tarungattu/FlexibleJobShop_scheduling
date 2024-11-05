@@ -24,12 +24,12 @@ import inspect
 
 c = 6
 n = 6
-num_amrs = 4
+num_amrs = 3
 N = 500
 pc = 0.7
 pm = 0.5
-pswap = 0.5
-pinv = 0.5
+# pswap = 0.5
+# pinv = 0.5
 T = 350
 
 workcenter_data = benchmarks.ft06['workcenter_data']
@@ -629,7 +629,7 @@ def next_gen_selection(parents, offsprings):
 
 def swapping(chromosome, amr_assignments):
     r = random.uniform(0,1)
-    if r > pswap:
+    if r > pm:
         return chromosome
     
     code = chromosome.encoded_list[:]
@@ -648,7 +648,7 @@ def swapping(chromosome, amr_assignments):
 def inversion(chromosome, amr_assignments):
     
     r = random.uniform(0,1)
-    if r > pinv:
+    if r > pm:
         return chromosome
     
     code = chromosome.encoded_list[:]
@@ -817,6 +817,8 @@ def GeneticAlgorithm():
     
     if display_schedule:
         plt.show()
+    else:
+        plt.close()
     
     # machine_seq_amrs, ptime_seq_amrs = get_sequences_in_amr(best_chromosome.amr_list)
     # print(machine_seq_amrs,'\n',ptime_seq_amrs)   

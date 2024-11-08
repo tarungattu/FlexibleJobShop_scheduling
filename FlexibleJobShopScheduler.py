@@ -37,7 +37,7 @@ class FlexibleJobShopScheduler():
         self.workcenter_data = workcenter_data
         self.machine_data = machine_data
         self.ptime_data = ptime_data
-        self.stagnation_limit = 50
+        self.stagnation_limit = 100
         self.parent_perc = 0.2
         self.offspring_perc = 0.8
         

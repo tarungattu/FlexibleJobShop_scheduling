@@ -10,7 +10,7 @@ def main():
     
     workcenter_data6 = benchmarks.ft06['workcenter_data']
     machine_data6 = benchmarks.ft06['machine_data']
-    ptime_data6 = benchmarks.ft06['ptime_data']
+    ptime_data6 = benchmarks.ft06['ptime_data'] 
     
     
     workcenter_data5  = benchmarks.la01['workcenter_data']

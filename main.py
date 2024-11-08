@@ -34,15 +34,15 @@ def main():
     
     
     
-    scheduler1 = FlexibleJobShopScheduler(4, 3, 2, 50, 0.7, 0.5, 100, workcenter_data4, machine_data4, ptime_data4)    
+    # scheduler1 = FlexibleJobShopScheduler(4, 3, 2, 50, 0.7, 0.5, 100, workcenter_data4, machine_data4, ptime_data4)    
     # scheduler1.set_distance_matrix(distances.four_machine_matrix)
     
     
-    # scheduler1 = FlexibleJobShopScheduler(6, 6, 3, 500, 0.7, 0.5, 350, workcenter_data6, machine_data6, ptime_data6)    
-    # scheduler1.set_distance_matrix(distances.six_machine_matrix)
+    scheduler1 = FlexibleJobShopScheduler(6, 6, 3, 50, 0.7, 0.5, 350, workcenter_data6, machine_data6, ptime_data6)    
+    scheduler1.set_distance_matrix(distances.six_machine_matrix)
     
     
-    # scheduler1 = FlexibleJobShopScheduler(5, 10, 3, 100, 0.7, 0.5, 350, workcenter_data5, machine_data5, ptime_data5)    
+    # scheduler1 = FlexibleJobShopScheduler(5, 10, 3, 500, 0.7, 0.5, 350, workcenter_data5, machine_data5, ptime_data5)    
     # scheduler1 = FlexibleJobShopScheduler(5, 15, 3, 350, 0.7, 0.5, 450, la06_data5, la06_ptime5)    
     # scheduler1.set_distance_matrix(distances.five_machine_matrix)
     
@@ -53,8 +53,8 @@ def main():
     scheduler1.runs = 1
     scheduler1.display_schedule = 1
     scheduler1.display_convergence = 0
-    scheduler1.enable_travel_time = 0
-    scheduler1.create_txt_file = 1
+    scheduler1.enable_travel_time = 1
+    scheduler1.create_txt_file = 0
     
     scheduler1.stagnation_limit = 100
     scheduler1.activate_termination = 1

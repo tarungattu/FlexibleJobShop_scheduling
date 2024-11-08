@@ -18,14 +18,14 @@ class Operation:
         
         
     # TURN ON SOURCE AND DISTANCE FOR USING TRAVEL TIME
-    def calculate_travel_time(self, amrs, jobs, distance_matrix, en_tt):
+    def calculate_travel_time(self, amrs, jobs, distance_matrix, en_tt, initial = 0):
         distance = 0
         
         velocity = amrs[jobs[self.job_number].amr_number].velocity
         
         if en_tt:
             
-            source = self.machine
+            source = self.workcenter
             
             if self.Pj == 0:
                 return 0
@@ -37,13 +37,19 @@ class Operation:
                     distance = distance_matrix[source][distance_matrix.shape[0]- 1] + distance_matrix[distance_matrix.shape[0] - 1][distance_matrix.shape[0] - 2]  
                     
                     return distance/velocity
+            
+            # CHECK IF THE JOB IS INITIALLY TRAVELLING FROM LOADING DOCK TO MACHINE
+            if initial == 1:
+                dest = source
+                distance = distance_matrix[distance_matrix.shape[0]- 2][dest]
+                return distance/velocity
                     
             if self.operation_number == len(jobs[self.job_number].operations) - 1:
                 
                 distance = distance_matrix[source][distance_matrix.shape[0]- 1] + distance_matrix[distance_matrix.shape[0] - 1][distance_matrix.shape[0] - 2]
             
             else:
-                dest = jobs[self.job_number].operations[self.operation_number + 1].machine
+                dest = jobs[self.job_number].operations[self.operation_number + 1].workcenter
                 distance = distance_matrix[source][dest]
                 
         return distance/velocity

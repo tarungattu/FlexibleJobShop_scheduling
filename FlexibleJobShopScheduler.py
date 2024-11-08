@@ -343,7 +343,12 @@ class FlexibleJobShopScheduler():
                     
                     if operation.operation_number == 0:
                         if amrs[jobs[operation.job_number].amr_number].completed_jobs == []:
-                            operation.start_time = workcenters[operation.workcenter].machines[operation.machine].finish_operation_time
+                            # THE AMR MUST TRAVEL TO FIRST MACHINE BEFORE PROCESSING FIRST OPERATION
+                            initial_travel_time = operation.calculate_travel_time(amrs, jobs, self.distance_matrix, self.enable_travel_time, 1)
+                            if workcenters[operation.workcenter].machines[operation.machine].finish_operation_time > initial_travel_time:
+                                operation.start_time = workcenters[operation.workcenter].machines[operation.machine].finish_operation_time
+                            else:
+                                operation.start_time = workcenters[operation.workcenter].machines[operation.machine].finish_operation_time + initial_travel_time
                         else:
                             # MAKE SURE THE PREVIOUS JOBS TRAVEL TIME SHOULD BE GIVEN TO NEXT JOB IF M'TH JOB IS HAVING PJ = 0
                             i = 0
@@ -983,20 +988,21 @@ class FlexibleJobShopScheduler():
                 # perform mutation
                 enhanced_list = []
                 for chromosome in offspring_list:
-                    mutated_chromosome = self.single_bit_mutation(chromosome, new_amr_assignments)
                     
+                    select_mutation = random.randint(1, 3)
+                    
+                    if select_mutation == 1:
+                        mutated_chromosome = self.single_bit_mutation(chromosome, new_amr_assignments)
+                    
+                    elif select_mutation == 2:
                     # perform swapping operation
-                    swap_chromosome = self.swapping(mutated_chromosome, new_amr_assignments)
+                        mutated_chromosome = self.swapping(chromosome, new_amr_assignments)
                     
-                    if swap_chromosome.Cmax < mutated_chromosome.Cmax:
+                    else:
                         # enhanced_list.append(swap_chromosome)
-                        inverted_chromosome = self.inversion(swap_chromosome, new_amr_assignments)
-                        if inverted_chromosome.Cmax < swap_chromosome.Cmax:
-                            enhanced_list.append(inverted_chromosome)
-                        else:
-                            enhanced_list.append(swap_chromosome)
-                    else:    
-                        enhanced_list.append(mutated_chromosome)
+                        mutated_chromosome = self.inversion(chromosome, new_amr_assignments)
+                       
+                    enhanced_list.append(mutated_chromosome)
                 
                     # # perform inversion operation on chromosome
                     # inverted_chromosome = inversion(swap_chromosome, new_amr_assignments)

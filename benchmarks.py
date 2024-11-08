@@ -1,7 +1,7 @@
 pinedo = {
     'workcenter_data' : [0,1,2,3, 1,0,3,2, 0,1,3,2],
     'ptime_data' : [10,8,4,0, 4,3,5,6, 4,7,3,0],
-    'machine_data':[4, 3, 2, 1]
+    'machine_data':[2, 2, 2, 2]
 }
 
 ft06 = {

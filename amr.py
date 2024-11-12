@@ -10,4 +10,4 @@ class AMR:
         self.workcenter_sequence = []
         self.ptime_sequence  = []
         self.travel_time = 0
-        self.velocity = 1 # METER/SECOND
+        self.velocity = 2 # METER/SECOND

@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 # Initialize main application window
 root = tk.Tk()
 root.title("Flexible Job Shop Scheduling GUI")
+root.geometry("600x400")
+root.config(bg="#f5f5f5")
 
 # Global dictionary to hold GA parameters
 ga_params = {
@@ -29,7 +31,17 @@ display_schedule = tk.IntVar(value=1)
 create_txt_file = tk.IntVar()
 update_json_file = tk.IntVar()
 
+# Create frames for layout
+left_frame = tk.Frame(root, bg="#f5f5f5", padx=10, pady=10)
+left_frame.pack(side="left", fill="y", padx=10, pady=10)
+
+right_frame = tk.Frame(root, bg="#f5f5f5", padx=10, pady=10)
+right_frame.pack(side="right", fill="y", padx=10, pady=10)
+
 # Toggle Button Setup
+settings_label = tk.Label(left_frame, text="Settings", font=("Helvetica", 14, "bold"), bg="#f5f5f5")
+settings_label.pack(anchor="w", pady=5)
+
 settings = [
     ("Activate Termination", activate_termination),
     ("Enable Travel Time", enable_travel_time),
@@ -40,10 +52,13 @@ settings = [
 ]
 
 for text, var in settings:
-    chk = tk.Checkbutton(root, text=text, variable=var)
-    chk.pack()
+    chk = tk.Checkbutton(left_frame, text=text, variable=var, bg="#f5f5f5", font=("Helvetica", 10))
+    chk.pack(anchor="w", pady=2)
 
 # Dropdown for benchmark selection
+benchmark_label = tk.Label(left_frame, text="Benchmark Selection", font=("Helvetica", 12, "bold"), bg="#f5f5f5")
+benchmark_label.pack(anchor="w", pady=10)
+
 def update_benchmark_data(selected_benchmark):
     global workcenter_data, machine_data, ptime_data
     benchmark = benchmarks.__dict__.get(selected_benchmark)
@@ -52,19 +67,22 @@ def update_benchmark_data(selected_benchmark):
     ptime_data = benchmark['ptime_data']
 
 benchmark_var = tk.StringVar()
-benchmark_menu = ttk.Combobox(root, textvariable=benchmark_var, values=list(benchmarks.__dict__.keys()))
+benchmark_menu = ttk.Combobox(left_frame, textvariable=benchmark_var, values=list(benchmarks.__dict__.keys()), state="readonly")
 benchmark_menu.set("Select Benchmark")
 benchmark_menu.bind("<<ComboboxSelected>>", lambda event: update_benchmark_data(benchmark_var.get()))
-benchmark_menu.pack()
+benchmark_menu.pack(anchor="w", pady=5)
 
 # GA Parameter Inputs
+ga_label = tk.Label(right_frame, text="GA Parameters", font=("Helvetica", 14, "bold"), bg="#f5f5f5")
+ga_label.pack(anchor="w", pady=5)
+
 param_labels = ["Population Size", "Max Generations", "Number of AMRs", "Number of Workcenters", "Number of Jobs"]
 param_entries = {}
 for label in param_labels:
-    lbl = tk.Label(root, text=label)
-    lbl.pack()
-    entry = tk.Entry(root)
-    entry.pack()
+    lbl = tk.Label(right_frame, text=label, bg="#f5f5f5", font=("Helvetica", 10))
+    lbl.pack(anchor="w", pady=2)
+    entry = tk.Entry(right_frame, width=20)
+    entry.pack(anchor="w", pady=2)
     param_entries[label] = entry
 
 # Run Button and Algorithm Execution
@@ -75,13 +93,9 @@ def run_algorithm():
         ga_params["num_amrs"] = int(param_entries["Number of AMRs"].get())
         ga_params["num_workcenters"] = int(param_entries["Number of Workcenters"].get())
         ga_params["num_jobs"] = int(param_entries["Number of Jobs"].get())
-        # ga_params["machine_data"] = list(param_entries["Number of machines each"].get())
-        
     except ValueError:
         print("Please enter valid integer values.")
         return
-    
-    
 
     # Create scheduler instance
     scheduler = FlexibleJobShopScheduler(
@@ -112,14 +126,11 @@ def run_algorithm():
         scheduler.set_distance_matrix(distances.five_machine_matrix)
     elif ga_params["num_workcenters"] == 10:
         scheduler.set_distance_matrix(distances.ten_machine_matrix)
-        
-        
-        
 
     # Run the Genetic Algorithm
     best_chromosome = scheduler.GeneticAlgorithm()
 
-run_button = tk.Button(root, text="Run Algorithm", command=run_algorithm)
-run_button.pack()
+run_button = tk.Button(right_frame, text="Run Algorithm", command=run_algorithm, bg="#4CAF50", fg="white", font=("Helvetica", 12), pady=5)
+run_button.pack(anchor="w", pady=15)
 
 root.mainloop()

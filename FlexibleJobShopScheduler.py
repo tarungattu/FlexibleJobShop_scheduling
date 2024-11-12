@@ -6,6 +6,7 @@ from scipy.stats import rankdata
 import time
 import os
 import json
+import math
 
 from job import Job
 from machine import Machine
@@ -437,9 +438,6 @@ class FlexibleJobShopScheduler():
 
         operation_index_list = self.get_jobindex_list(ranked_list)
         
-        # # CASE 1
-        # operation_index_list = [0, 1, 2, 0, 2, 1,  1, 0, 2, 1, 0, 2]
-        
         
         self.generate_operations(jobs)
         self.assign_data_to_operations(jobs, self.operation_data)
@@ -451,6 +449,7 @@ class FlexibleJobShopScheduler():
         # # get the sequence of machines and ptimes
         workcenter_sequence, ptime_sequence = self.get_workcenter_and_time_sequence(operation_objects)
         
+        # use heuristic machine selection for initial population only
         if heuristic:
             machine_sequence = self.get_machine_indices_list(chromosome, workcenter_sequence, self.machine_data, operation_objects)
         else:
@@ -521,7 +520,7 @@ class FlexibleJobShopScheduler():
         ax.tick_params(axis='x', labelcolor='black', labelsize=12)
         ax.grid(True, linestyle='--')
 
-        tmpTitle = f'Scheduling for c={self.c}; n={self.n} and AMRs={self.num_amrs} with Cmax={round(Cmax, 2)}'
+        tmpTitle = f'Scheduling for c={self.c}; n={self.n} and AMRs={self.num_amrs} with Cmax={math.ceil(Cmax)}'
         ax.set_title(tmpTitle, size=14, color='black')
 
         colors = ['orange', 'deepskyblue', 'indianred', 'limegreen', 'slateblue', 'gold', 'violet', 'grey', 'red', 'magenta', 'blue', 'green', 'silver', 'lavender', 'turquoise', 'orchid'] # Adjust based on how many jobs you want
@@ -1084,6 +1083,9 @@ class FlexibleJobShopScheduler():
         
         print('\n')
         return best_chromosome
+    
+    
+    
 
 
 if __name__ == '__main__':

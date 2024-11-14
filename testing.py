@@ -70,7 +70,10 @@ def main():
     # print(f'ranked list : {chromosome1.ranked_list}\n operation_index :{chromosome1.operation_index_list},\n operation object{chromosome1.operation_schedule}\n')
     # print(f'machine sequence: {chromosome1.machine_sequence}\n ptime sequence: {chromosome1.ptime_sequence}\n Cmax: {chromosome1.Cmax}\n wait time: {chromosome1.wait_time}\n idle_time: {chromosome1.idle_time}\n fitness: {chromosome1.fitness}')
     
-    chromosome = scheduler1.process_chromosome( [1.86, 8.54, 3.14, 5.09, 3.71, 6.83, 4.81, 2.46, 1.37, 11.24, 2.5, 6.7], [0, 1, 1], 1)
+    # chromosome = scheduler1.process_chromosome( [1.86, 8.54, 3.14, 5.09, 3.71, 6.83, 4.81, 2.46, 1.37, 11.24, 2.5, 6.7], [0, 1, 1], 1)
+    # chromosome = scheduler1.process_chromosome( [7.71, 3.52, 1.97, 2.24, 10.45, 5.77, 6.27, 2.19, 4.71, 3.48, 5.41, 2.34], [0, 1, 1], 1)
+    # chromosome = scheduler1.process_chromosome( [1.86, 8.54, 3.14, 5.09, 3.71, 6.83, 6.27, 2.19, 4.71, 3.48, 5.41, 2.34], [0, 1, 1], 1)
+    chromosome = scheduler1.process_chromosome( [7.71, 3.52, 1.97, 2.24, 10.45, 5.77, 4.81, 2.46, 1.37, 11.24, 2.5, 6.7], [0, 1, 1], 1)
     
     scheduler1.PlotGanttChart_with_amr_scalable(chromosome, machine_data4,)
     plt.show()

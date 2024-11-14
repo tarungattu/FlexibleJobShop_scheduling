@@ -26,6 +26,7 @@ import inspect
 
 class FlexibleJobShopScheduler():
     def __init__(self, c, n, num_amrs, N, pc, pm, T, workcenter_data, machine_data, ptime_data):
+        # GA params
         self.c = c
         self.n = n
         self.num_amrs = num_amrs
@@ -42,6 +43,7 @@ class FlexibleJobShopScheduler():
         self.parent_perc = 0.2
         self.offspring_perc = 0.8
         
+        # tools
         self.activate_termination = 0
         self.enable_travel_time = 0
         self.display_convergence = 0
@@ -49,6 +51,14 @@ class FlexibleJobShopScheduler():
         self.create_txt_file = 0
         self.update_json_file = 0
         self.runs = 1
+        
+        # constraints
+        self.machine_restriction = 0
+        
+        if self.machine_restriction:
+            self.M_j = [[0, 0, [1]], [1, 0, [1]]]  # [job, operation, [elligible machines]]
+        else:
+            self.M_j = None
         
         self.distance_matrix = None
         self.save_file_directory = 'D:\\SDP\\Results\\Default'
@@ -91,10 +101,6 @@ class FlexibleJobShopScheduler():
         return matrix
     
     
-    # def assign_operations(self, jobs, operation_data):
-    #     for job, operation in zip(jobs, operation_data):
-    #         job.operations = operation
-    
     def generate_population(self, N, c):
         population = []
         for _ in range(N):
@@ -103,7 +109,6 @@ class FlexibleJobShopScheduler():
         return population  
     
     
-###
     def generate_random_population(self, N, n, c, amr_assignments):
         encoded_lists = []
         population = []
@@ -268,6 +273,7 @@ class FlexibleJobShopScheduler():
             explored.append(chromosome[i])
             numcount = explored.count(chromosome[i])
             # if numcount < m:
+            jobs[chromosome[i]].operations[numcount-1].index = i
             operation_list.append(jobs[chromosome[i]].operations[numcount-1])
         return operation_list   
     
@@ -423,7 +429,7 @@ class FlexibleJobShopScheduler():
             for operation in job.operations:
                 operation.travel_time = operation.calculate_travel_time(amrs, jobs, distance_matrix, self.enable_travel_time)
                 
-    def process_chromosome(self, chromosome, amr_assignments, heuristic = 0):
+    def process_chromosome(self, encoded_list, amr_assignments, heuristic = 0):
     
         jobs = [Job(number) for number in range(self.n)]
         amrs = [AMR(number) for number in range(self.num_amrs)]
@@ -432,9 +438,9 @@ class FlexibleJobShopScheduler():
         self.generate_machines(workcenters, self.machine_data)
         # assign_operations(jobs, operation_data)
         
-        chromosome = self.remove_duplicates(chromosome)
+        encoded_list = self.remove_duplicates(encoded_list)
 
-        ranked_list = self.get_integer_list(chromosome)
+        ranked_list = self.get_integer_list(encoded_list)
 
         operation_index_list = self.get_jobindex_list(ranked_list)
         
@@ -442,6 +448,7 @@ class FlexibleJobShopScheduler():
         self.generate_operations(jobs)
         self.assign_data_to_operations(jobs, self.operation_data)
 
+        # [each index replaced with its object]
         operation_objects = self.get_operation_objects(operation_index_list, jobs)   
 
         self.assign_amrs_to_jobs(jobs, amrs, amr_assignments)
@@ -451,9 +458,13 @@ class FlexibleJobShopScheduler():
         
         # use heuristic machine selection for initial population only
         if heuristic:
-            machine_sequence = self.get_machine_indices_list(chromosome, workcenter_sequence, self.machine_data, operation_objects)
+            machine_sequence = self.get_machine_indices_list(encoded_list, workcenter_sequence, self.machine_data, operation_objects)
         else:
-            machine_sequence = self.get_random_machine_indices_list(chromosome, workcenter_sequence, self.machine_data, operation_objects)
+            machine_sequence = self.get_random_machine_indices_list(encoded_list, workcenter_sequence, self.machine_data, operation_objects)
+            
+        # HERE GOES MACHINE RESTRICTIONS REPAIR FUNCTION
+        if self.machine_restriction == 1:
+            self.repair_machine_constraints(machine_sequence, operation_objects, jobs)
             
             
         # # SET TRAVEL TIMES FOR EACH JOB
@@ -465,7 +476,7 @@ class FlexibleJobShopScheduler():
         Cmax = self.get_Cmax(workcenters)
         
             
-        chromosome = Chromosome(chromosome)
+        chromosome = Chromosome(encoded_list)
         chromosome.ranked_list = ranked_list
         chromosome.operation_index_list = operation_index_list
         chromosome.job_list = jobs
@@ -819,6 +830,8 @@ class FlexibleJobShopScheduler():
 
         return ranked_list, random_numbers
     
+    
+    # not in use
     def generate_population_with_heuristic(self, operation_data, amr_assignments):
         n = self.n
         m = self.m
@@ -934,6 +947,41 @@ class FlexibleJobShopScheduler():
             
             for i, j in zip(xpoints, ypoints):
                 file.write(f'{i} \t {j} \n')
+                
+                
+    def setup_constraints(self):
+        # self.M_j = [[0, 0, [1]]]    # [job, operation, [elligible machines]]
+        pass
+    
+    
+    # Validate each constraint. Select a machine only from elligible set.
+    def repair_machine_constraints(self, machine_sequence, operation_objects, jobs):
+        
+        for constraint in self.M_j:
+            job_index = constraint[0]
+            operation_index = constraint[1]
+            elligible_machines = constraint[2]  # list of elligible machines
+            
+            # for i, operation in enumerate(operation_objects):
+            #     if job_index == operation.job_number and operation_index == operation.operation_number:
+            #         operation.machine = random.choice(elligible_machines)
+            #         machine_sequence[i] = operation.machine
+            #         break
+            
+            exact_operation = jobs[job_index].operations[operation_index]
+            
+            if exact_operation.machine in elligible_machines:
+                # do nothine
+                continue
+            else:
+                # access the exact operation and reset machine to elligible machine
+                exact_operation.machine = random.choice(elligible_machines)
+                # also edit machine sequence list at the correct index
+                machine_sequence[exact_operation.index] = exact_operation.machine
+            
+            
+            
+        
 
     def GeneticAlgorithm(self):
         
@@ -943,16 +991,22 @@ class FlexibleJobShopScheduler():
         t = 0
         ypoints = []
         
+        # set initial amr assignments
         amr_assignments = self.get_amr_assignments()
         population = self.generate_random_population(self.N, self.n, self.c, amr_assignments)
             
         sorted_population = sorted(population, key = lambda  x : x.fitness )
-            
+        
+        # get current  best chromosome
         best_chromosome = sorted_population[0]
         
         history = 0
         stagnation = 0
         
+        if self.machine_restriction:
+            self.setup_constraints()
+        
+        # start generation loop
         while t < self.T:
                 
                 new_amr_assignments = self.get_amr_assignments()
@@ -960,7 +1014,6 @@ class FlexibleJobShopScheduler():
                 # create mating pool
                 winners_list = self.tournament(population)
                 # winners_list = three_way_tournament(population)
-                
                 
                 
                 # perform crossover on mating pool
@@ -984,6 +1037,13 @@ class FlexibleJobShopScheduler():
                     indices.remove(i1)
                     indices.remove(i2)
                     
+                    
+                # REPAIR FUNCTIONS TO GO HERE
+                    
+                    
+                    
+                    
+                    
                 # perform mutation
                 enhanced_list = []
                 for chromosome in offspring_list:
@@ -1003,16 +1063,23 @@ class FlexibleJobShopScheduler():
                        
                     enhanced_list.append(mutated_chromosome)
                 
-                    # # perform inversion operation on chromosome
-                    # inverted_chromosome = inversion(swap_chromosome, new_amr_assignments)
-                    
-                    # enhanced_list.append(mutated_chromosome)
-                    
-                    # # selection of survivors for next generation
+                # REPAIR FUNCTIONS TO GO HERE
                 
+                
+                
+                
+                
+                
+                # EVALUATE FITNESS OF EACH CHROMOSOME ONCE MORE, PENALIZE IF BREAKING CONSTRAINTS
+                
+                
+                
+                
+                # select next population
                 survivors, best_in_gen = self.next_gen_selection_elitism(winners_list, enhanced_list, self.parent_perc, self.offspring_perc)
                 
                 survivors[-1] = best_in_gen
+                #CHECK IF AMR ASSIGNMENT IS BETTER OR WORSE
                 if best_in_gen.fitness < best_chromosome.fitness:
                     best_chromosome = best_in_gen
                     amr_assignments = new_amr_assignments
@@ -1027,7 +1094,6 @@ class FlexibleJobShopScheduler():
                     converged_at = elapsed
                     break
                 
-                #CHECK IF AMR ASSIGNMENT IS BETTER OR WORSE
                 
                 history = best_chromosome.fitness
                     

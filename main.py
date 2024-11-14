@@ -8,19 +8,19 @@ def main():
     machine_data4 = benchmarks.pinedo['machine_data']
     ptime_data4 = benchmarks.pinedo['ptime_data']
     
-    workcenter_data6 = benchmarks.ft06['workcenter_data']
-    machine_data6 = benchmarks.ft06['machine_data']
-    ptime_data6 = benchmarks.ft06['ptime_data'] 
+    workcenter_data6 = benchmarks.ft06c6n6['workcenter_data']
+    machine_data6 = benchmarks.ft06c6n6['machine_data']
+    ptime_data6 = benchmarks.ft06c6n6['ptime_data'] 
     
     
-    workcenter_data5  = benchmarks.la01['workcenter_data']
-    machine_data5  = benchmarks.la01['machine_data']
-    ptime_data5  = benchmarks.la01['ptime_data']
+    workcenter_data5  = benchmarks.la01c5n10['workcenter_data']
+    machine_data5  = benchmarks.la01c5n10['machine_data']
+    ptime_data5  = benchmarks.la01c5n10['ptime_data']
     
     
-    workcenter_data10 = benchmarks.ft10['workcenter_data']
-    machine_data10 = benchmarks.ft10['machine_data']
-    ptime_data10 = benchmarks.ft10['ptime_data']
+    workcenter_data10 = benchmarks.ft10c10n10['workcenter_data']
+    machine_data10 = benchmarks.ft10c10n10['machine_data']
+    ptime_data10 = benchmarks.ft10c10n10['ptime_data']
     
     # la06_data5  = benchmarks.la06['machine_data']
     # la06_data5  = benchmarks.la06['machine_data']
@@ -34,12 +34,12 @@ def main():
     
     
     
-    # scheduler1 = FlexibleJobShopScheduler(4, 3, 2, 50, 0.7, 0.5, 100, workcenter_data4, machine_data4, ptime_data4)    
-    # scheduler1.set_distance_matrix(distances.four_machine_matrix)
+    scheduler1 = FlexibleJobShopScheduler(4, 3, 2, 6, 0.7, 0.5, 100, workcenter_data4, machine_data4, ptime_data4)    
+    scheduler1.set_distance_matrix(distances.four_machine_matrix)
     
     
-    scheduler1 = FlexibleJobShopScheduler(6, 6, 3, 50, 0.7, 0.5, 350, workcenter_data6, machine_data6, ptime_data6)    
-    scheduler1.set_distance_matrix(distances.six_machine_matrix)
+    # scheduler1 = FlexibleJobShopScheduler(6, 6, 3, 50, 0.7, 0.5, 350, workcenter_data6, machine_data6, ptime_data6)    
+    # scheduler1.set_distance_matrix(distances.six_machine_matrix)
     
     
     # scheduler1 = FlexibleJobShopScheduler(5, 10, 3, 500, 0.7, 0.5, 350, workcenter_data5, machine_data5, ptime_data5)    

@@ -1,5 +1,6 @@
 class Operation:
     def __init__(self, job_number):
+        index = 0
         self.job_number = job_number
         self.operation_number = 0
         self.workcenter = None  # int

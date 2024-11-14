@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 # Initialize main application window
 root = tk.Tk()
 root.title("Flexible Job Shop Scheduling GUI")
-root.geometry("600x400")
+root.geometry("600x500")  # Adjusted to accommodate the new input field
 root.config(bg="#f5f5f5")
 
 # Global dictionary to hold GA parameters
@@ -21,15 +21,17 @@ ga_params = {
     "crossover_rate": 0.7,
     "mutation_rate": 0.5,
     "max_generations": 0,
+    "machine_data": []  # New field for storing machine_data
 }
 
 # Toggle variables for each setting
-activate_termination = tk.IntVar()
-enable_travel_time = tk.IntVar()
+activate_termination = tk.IntVar(value=1)
+enable_travel_time = tk.IntVar(value=1)
 display_convergence = tk.IntVar()
 display_schedule = tk.IntVar(value=1)
 create_txt_file = tk.IntVar()
 update_json_file = tk.IntVar()
+machine_restrictions = tk.IntVar()
 
 # Create frames for layout
 left_frame = tk.Frame(root, bg="#f5f5f5", padx=10, pady=10)
@@ -48,7 +50,7 @@ settings = [
     ("Display Convergence", display_convergence),
     ("Display Schedule", display_schedule),
     ("Create TXT File", create_txt_file),
-    # ("Update JSON File", update_json_file),
+    ("Apply Machine restrictions", machine_restrictions),
 ]
 
 for text, var in settings:
@@ -85,6 +87,12 @@ for label in param_labels:
     entry.pack(anchor="w", pady=2)
     param_entries[label] = entry
 
+# New input field for machine_data
+machine_data_label = tk.Label(right_frame, text="Machine Data (Enter as a list)", bg="#f5f5f5", font=("Helvetica", 10))
+machine_data_label.pack(anchor="w", pady=2)
+machine_data_entry = tk.Entry(right_frame, width=20)
+machine_data_entry.pack(anchor="w", pady=2)
+
 # Run Button and Algorithm Execution
 def run_algorithm():
     try:
@@ -93,9 +101,18 @@ def run_algorithm():
         ga_params["num_amrs"] = int(param_entries["Number of AMRs"].get())
         ga_params["num_workcenters"] = int(param_entries["Number of Workcenters"].get())
         ga_params["num_jobs"] = int(param_entries["Number of Jobs"].get())
+        # Convert machine_data input to a Python list
+        if machine_data_entry.get().strip():
+        # Convert machine_data input to a Python list if provided
+            ga_params["machine_data"] = eval(machine_data_entry.get())
+        else:
+            # Use default machine_data if no input is provided
+            ga_params["machine_data"] = machine_data
     except ValueError:
         print("Please enter valid integer values.")
         return
+    
+    
 
     # Create scheduler instance
     scheduler = FlexibleJobShopScheduler(
@@ -118,6 +135,8 @@ def run_algorithm():
     scheduler.display_schedule = display_schedule.get()
     scheduler.create_txt_file = create_txt_file.get()
     scheduler.update_json_file = update_json_file.get()
+    scheduler.machine_restriction = machine_restrictions.get()
+    scheduler.machine_data = ga_params["machine_data"]  # Set machine_data in scheduler
     if ga_params["num_workcenters"] == 4:
         scheduler.set_distance_matrix(distances.four_machine_matrix)
     elif ga_params["num_workcenters"] == 6:

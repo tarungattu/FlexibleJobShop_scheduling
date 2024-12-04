@@ -581,15 +581,23 @@ class FlexibleJobShopScheduler():
         
         if self.create_txt_file:
             # CHANGE DIRECTORY FOR SAVING FIGURE
+            
+            folder_name = "run results"
+        
+            # Check if the folder exists,   if not, create it
+            if not os.path.exists(folder_name):
+                os.makedirs(folder_name)
+                
+                
             timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-            filename = f'gantt{timestamp}.png'  # Filename without directory
-            directory = self.save_file_directory  # Your directory
-
-            # Use os.path.join to correctly join directory and filename
-            filepath = os.path.join(directory, filename)
-
-            # Now save the figure to the correct path
-            plt.savefig(filepath)
+            filename = os.path.join(folder_name, self.GetUniqueFileName("GA", "png"))
+            
+            plt.savefig(filename)
+            
+    def GetUniqueFileName (self, prefix, ftype):
+        timestamp = int (time.time())
+        fileName = "{}_m{}_n{}_a{}_{}.{}".format (prefix, self.c, self.n, self.num_amrs, timestamp, ftype)
+        return fileName
         
 
     def tournament(self, population):
@@ -915,9 +923,16 @@ class FlexibleJobShopScheduler():
             
     def get_file(self, best_chromosome, processing_time, xpoints, ypoints):
         timestamp = time.strftime("%Y%m%d-%H%M%S")
-        filename = f'la01{timestamp}.txt'  # CHANGE FILE NAME
+        filename = self.GetUniqueFileName("GA", "txt")
 
-        directory = self.save_file_directory  # CHANGE SAVING DIRECTORY
+        # Define the folder name
+        directory = "run results"  # Folder for saving the file
+
+        # Check if folder exists, create if necessary
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+            
+        # Construct the full file path
         filepath = os.path.join(directory, filename)
         
         with open(filepath, 'w') as file:
@@ -940,9 +955,9 @@ class FlexibleJobShopScheduler():
             file.write(f"Problem solved in {round(processing_time, 2)} seconds\n\n")
 
             file.write("----------------------------------------------------------------------------------------------\n")
-            file.write("n \t c\t a\t T \t N \t Pc \t Pm \t Cmax \t WAIT \t IDLE\t Jobs completion \t CPU Time (s) \t Termination value\n ")
+            file.write("n \t c\t a\t T \t N \t Pc \t Pm \t Cmax \t WAIT \t IDLE\t Jobs completion \t CPU Time (s) \t Termination value \t Machines in Workcenters\n ")
             file.write("----------------------------------------------------------------------------------------------\n")
-            file.write(f" {self.n} \t {self.c} \t {self.num_amrs} \t {self.T} \t {self.N} \t {self.pc} \t {self.pm}  \t {best_chromosome.Cmax} \t {best_chromosome.wait_time} \t {best_chromosome.idle_time} \t {best_chromosome.jobs_completion_time} \t {round(processing_time, 2)} \t {self.stagnation_limit} \n")
+            file.write(f" {self.n} \t {self.c} \t {self.num_amrs} \t {self.T} \t {self.N} \t {self.pc} \t {self.pm}  \t {best_chromosome.Cmax} \t {best_chromosome.wait_time} \t {best_chromosome.idle_time} \t {best_chromosome.jobs_completion_time} \t {round(processing_time, 2)} \t {self.stagnation_limit} \t {self.machine_data}\n")
             file.write("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
             
             for i, j in zip(xpoints, ypoints):

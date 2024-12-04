@@ -73,7 +73,14 @@ def main():
     # chromosome = scheduler1.process_chromosome( [1.86, 8.54, 3.14, 5.09, 3.71, 6.83, 4.81, 2.46, 1.37, 11.24, 2.5, 6.7], [0, 1, 1], 1)
     # chromosome = scheduler1.process_chromosome( [7.71, 3.52, 1.97, 2.24, 10.45, 5.77, 6.27, 2.19, 4.71, 3.48, 5.41, 2.34], [0, 1, 1], 1)
     # chromosome = scheduler1.process_chromosome( [1.86, 8.54, 3.14, 5.09, 3.71, 6.83, 6.27, 2.19, 4.71, 3.48, 5.41, 2.34], [0, 1, 1], 1)
-    chromosome = scheduler1.process_chromosome( [7.71, 3.52, 1.97, 2.24, 10.45, 5.77, 4.81, 2.46, 1.37, 11.24, 2.5, 6.7], [0, 1, 1], 1)
+    # chromosome = scheduler1.process_chromosome( [7.71, 3.52, 1.97, 2.24, 10.45, 5.77, 4.81, 2.46, 1.37, 11.24, 2.5, 6.7], [0, 1, 1], 1)
+    
+    # mutation
+    # chromosome = scheduler1.process_chromosome( [1.86, 8.54, 3.14, 5.09, 3.71, 6.83, 4.81, 6.2, 1.37, 11.24, 2.5, 6.7], [0, 1, 1], 1)
+    # swapped
+    # chromosome = scheduler1.process_chromosome( [1.86, 8.54, 3.14, 1.37, 3.71, 6.83, 4.81, 2.46, 5.09, 11.24, 2.5, 6.7], [0, 1, 1], 1)
+    # inverted
+    chromosome = scheduler1.process_chromosome( [1.86, 8.54, 3.14, 1.37, 2.46, 4.81, 6.83, 3.71, 5.09, 11.24, 2.5, 6.7], [0, 1, 1], 1)
     
     scheduler1.PlotGanttChart_with_amr_scalable(chromosome, machine_data4,)
     plt.show()

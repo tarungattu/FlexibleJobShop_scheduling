@@ -87,6 +87,9 @@ best_chromosome = example_scheduler.GeneticAlgorithm()
 
 <img src="https://github.com/user-attachments/assets/a52a6b00-94cc-40b0-b303-1526492a93df" alt="Example solution" width="700"/>
 
+For ease of use, run the scheduler GUI and enter the necessary data to get the schedule output. 
+![GUI](https://github.com/user-attachments/assets/4b177d1c-332b-435a-82be-76e1ebcfc311)
+
 ## Guide to ADD instances to the Benchmarks file (coming soon)
 Benchmark instances in the benchmarks file are stored as dictionaries, (might later make them into json files). The dictionary will have workcenter data; the routing of the job on the shop floor, and ptime_data, the amount of time the job will stay at each machine for processing.
 Machine data will contain number of machines in each workcenter. (index wise)

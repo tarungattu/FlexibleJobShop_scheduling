@@ -3,3 +3,6 @@
 *.pyc
 
 /__pycache__
+/__pycache__
+__pycache__/workcenter.cpython-311.pyc
+*.pyc

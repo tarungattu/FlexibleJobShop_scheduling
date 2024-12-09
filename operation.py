@@ -12,6 +12,9 @@ class Operation:
         
     def __str__(self):
         return str(self.job_number)
+    
+    def __repr__(self):
+        return f'(job {self.job_number} operation {self.operation_number})'
         
     def getCj(self):
         self.Cj = self.start_time + self.Pj

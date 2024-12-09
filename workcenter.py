@@ -1,8 +1,8 @@
-c = 4
+
 from machine import Machine
 
 class Workcenter:
-    def __init__(self, workcenter_id):
+    def __init__(self, workcenter_id, c):
         self.machines = []   # machine objects
         self.workcenter_id = workcenter_id % c # center number
         self.operation_list = []

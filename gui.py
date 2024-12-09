@@ -21,6 +21,7 @@ ga_params = {
     "crossover_rate": 0.7,
     "mutation_rate": 0.5,
     "max_generations": 0,
+    "stagnation_limit": 40,
     "machine_data": []  # New field for storing machine_data
 }
 
@@ -78,7 +79,7 @@ benchmark_menu.pack(anchor="w", pady=5)
 ga_label = tk.Label(right_frame, text="GA Parameters", font=("Helvetica", 14, "bold"), bg="#f5f5f5")
 ga_label.pack(anchor="w", pady=5)
 
-param_labels = ["Population Size", "Max Generations", "Number of AMRs", "Number of Workcenters", "Number of Jobs"]
+param_labels = ["Population Size", "Max Generations", "Number of AMRs", "Number of Workcenters", "Number of Jobs", "Similar Termination"]
 param_entries = {}
 for label in param_labels:
     lbl = tk.Label(right_frame, text=label, bg="#f5f5f5", font=("Helvetica", 10))
@@ -101,6 +102,7 @@ def run_algorithm():
         ga_params["num_amrs"] = int(param_entries["Number of AMRs"].get())
         ga_params["num_workcenters"] = int(param_entries["Number of Workcenters"].get())
         ga_params["num_jobs"] = int(param_entries["Number of Jobs"].get())
+        ga_params["stagnation_limit"] = int(param_entries["Similar Termination"].get())
         # Convert machine_data input to a Python list
         if machine_data_entry.get().strip():
         # Convert machine_data input to a Python list if provided
@@ -127,6 +129,7 @@ def run_algorithm():
         machine_data,
         ptime_data
     )
+    scheduler.stagnation_limit = ga_params["stagnation_limit"]
     
     # Set scheduler attributes based on checkboxes
     scheduler.activate_termination = activate_termination.get()
@@ -145,6 +148,8 @@ def run_algorithm():
         scheduler.set_distance_matrix(distances.five_machine_matrix)
     elif ga_params["num_workcenters"] == 10:
         scheduler.set_distance_matrix(distances.ten_machine_matrix)
+    elif ga_params["num_workcenters"] == 20:
+        scheduler.set_distance_matrix(distances.twenty_machine_matrix)
 
     # Run the Genetic Algorithm
     best_chromosome = scheduler.GeneticAlgorithm()

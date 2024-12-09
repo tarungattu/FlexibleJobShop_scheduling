@@ -22,6 +22,12 @@ def main():
     machine_data10 = benchmarks.ft10c10n10['machine_data']
     ptime_data10 = benchmarks.ft10c10n10['ptime_data']
     
+    ta20_20_workcenter_data = benchmarks.twenty_twenty['workcenter_data']
+    ta20_20_machine_data = benchmarks.twenty_twenty['machine_data']
+    ta20_20_ptime_data = benchmarks.twenty_twenty['ptime_data']
+    ta20_50_machine_data = benchmarks.twenty_fifty['machine_data']
+    ta20_50_ptime_data = benchmarks.twenty_fifty['ptime_data']
+    
     # la06_data5  = benchmarks.la06['machine_data']
     # la06_data5  = benchmarks.la06['machine_data']
     # la06_ptime5  = benchmarks.la06['ptime_data']
@@ -34,8 +40,8 @@ def main():
     
     
     
-    scheduler1 = FlexibleJobShopScheduler(4, 3, 2, 6, 0.7, 0.5, 100, workcenter_data4, machine_data4, ptime_data4)    
-    scheduler1.set_distance_matrix(distances.four_machine_matrix)
+    # scheduler1 = FlexibleJobShopScheduler(4, 3, 2, 6, 0.7, 0.5, 100, workcenter_data4, machine_data4, ptime_data4)    
+    # scheduler1.set_distance_matrix(distances.four_machine_matrix)
     
     
     # scheduler1 = FlexibleJobShopScheduler(6, 6, 3, 50, 0.7, 0.5, 350, workcenter_data6, machine_data6, ptime_data6)    
@@ -47,16 +53,21 @@ def main():
     # scheduler1.set_distance_matrix(distances.five_machine_matrix)
     
     
-    # scheduler1 = FlexibleJobShopScheduler(10, 10, 4, 500, 0.7, 0.5, 350, workcenter_data10, machine_data10, ptime_data10)    
+    # scheduler1 = FlexibleJobShopScheduler(10, 10, 4, 100, 0.7, 0.5, 350, workcenter_data10, machine_data10, ptime_data10)    
     # scheduler1 = FlexibleJobShopScheduler(10, 15, 3, 350, 0.7, 0.5, 450, la23_data10, la23_ptime10)    
     # scheduler1.set_distance_matrix(distances.ten_machine_matrix)
+    
+    scheduler1 = FlexibleJobShopScheduler(20, 20, 3, 50, 0.7, 0.5, 600, ta20_20_workcenter_data, ta20_20_machine_data, ta20_20_ptime_data)    
+    # # scheduler1 = JobShopScheduler(20, 50, 7, 100, 0.7, 0.5, 600, ta20_50_machine_data, ta20_50_ptime_data)    
+    scheduler1.set_distance_matrix(distances.twenty_machine_matrix)
+    
     scheduler1.runs = 1
     scheduler1.display_schedule = 1
     scheduler1.display_convergence = 0
     scheduler1.enable_travel_time = 1
     scheduler1.create_txt_file = 0
     
-    scheduler1.stagnation_limit = 100
+    scheduler1.stagnation_limit = 60
     scheduler1.activate_termination = 1
     
     print(scheduler1.operation_data)

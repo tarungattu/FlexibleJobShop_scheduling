@@ -2,11 +2,8 @@ from operation import Operation
 
 # number of jobs
 
-n = 15
-c = 4
-
 class Job:
-    def __init__(self, job_number):
+    def __init__(self, job_number, n):
         # self.joblist = []
         self.job_number = job_number % n
         self.job_start_time = 0

@@ -334,7 +334,7 @@ class FlexibleJobShopScheduler():
         t_op = operation_schedule
         skipped = []
         while t_op != []:
-            # print('running')
+            # print('calculating cmax')
             for operation in t_op:
                 # CHECK IF AMR IS ASSIGNED TO A JOB, ONLY ASSIGN IF THE OPERATION NUMBER IS ZERO
                 if amrs[jobs[operation.job_number].amr_number].current_job == None and operation.operation_number == 0:
@@ -431,9 +431,9 @@ class FlexibleJobShopScheduler():
                 
     def process_chromosome(self, encoded_list, amr_assignments, heuristic = 0):
     
-        jobs = [Job(number) for number in range(self.n)]
+        jobs = [Job(number, self.n) for number in range(self.n)]
         amrs = [AMR(number) for number in range(self.num_amrs)]
-        workcenters = [Workcenter(number) for number in range(self.c)]
+        workcenters = [Workcenter(number, self.c) for number in range(self.c)]
         
         self.generate_machines(workcenters, self.machine_data)
         # assign_operations(jobs, operation_data)
@@ -519,7 +519,7 @@ class FlexibleJobShopScheduler():
         for wc_index, machines_in_wc in enumerate(workcenter_machine_list):
             for machine_num in range(machines_in_wc):
                 yticks.append(current_tick)
-                ytick_labels.append(f'{wc_index}-{machine_num}')  # Workcenter-Machine label
+                ytick_labels.append(f'{int(wc_index + 1)}-{int(machine_num + 1)}')  # Workcenter-Machine label
                 current_tick += 1
 
         ax.set_ylim(-0.5, total_machines - 0.5)
@@ -546,11 +546,11 @@ class FlexibleJobShopScheduler():
                     ST = j.start_time
                     if j.Pj != 0:
                         # Job operation block
-                        ax.broken_barh([(ST, j.Pj)], (-0.3 + machine_count, 0.6), facecolor=colors[j.job_number], linewidth=1, edgecolor='black')
+                        ax.broken_barh([(ST, j.Pj)], (-0.3 + machine_count, 0.6), facecolor=colors[j.job_number%len(colors)], linewidth=1, edgecolor='black')
                         # Travel time block
                         ax.broken_barh([(j.Cj, j.travel_time)], (-0.3 + machine_count, 0.6), facecolor='black', linewidth=1, edgecolor='black')
                         # Text in the middle of job blocks
-                        ax.text(ST + (j.Pj / 2 - 0.3), machine_count + 0.03, '{}'.format(j.job_number), fontsize=10, color='white')
+                        ax.text(ST + (j.Pj / 2 - 0.3), machine_count + 0.03, '{}'.format(j.job_number + 1), fontsize=10, color='white')
 
                 machine_count += 1  # Move to the next machine in global index
 
@@ -560,7 +560,7 @@ class FlexibleJobShopScheduler():
         top_ax.set_xlabel('time', fontweight='bold', loc='right', color='black', fontsize=12)
         top_ax.set_ylim(-0.5, self.num_amrs - 0.5)
         top_ax.set_yticks(range(self.num_amrs), minor=False)
-        top_ax.set_yticklabels(range(0, self.num_amrs), minor=False)
+        top_ax.set_yticklabels(range(1, self.num_amrs + 1), minor=False)
         top_ax.tick_params(axis='y', labelcolor='black', labelsize=10)
         top_ax.set_xlim(0, Cmax + 2)
         top_ax.tick_params(axis='x', labelcolor='black', labelsize=12)
@@ -574,8 +574,8 @@ class FlexibleJobShopScheduler():
                 ST = j.job_start_time
                 duration = j.job_completion_time - j.job_start_time
                 if duration != 0:
-                    top_ax.broken_barh([(ST, duration)], (-0.3 + i, 0.6), facecolor=colors[j.job_number], linewidth=1, edgecolor='black')
-                    top_ax.text(ST + (duration) / 2 , i - 0.2, '{}'.format(j.job_number), fontsize=10, ha='center', color='white')
+                    top_ax.broken_barh([(ST, duration)], (-0.3 + i, 0.6), facecolor=colors[j.job_number%len(colors)], linewidth=1, edgecolor='black')
+                    top_ax.text(ST + (duration) / 2 , i - 0.2, '{}'.format(j.job_number + 1), fontsize=10, ha='center', color='white')
 
         plt.tight_layout()
         
